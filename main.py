@@ -1,6 +1,18 @@
 import json
 from pprint import pprint
-from typing import List
+from typing import Any, List
+
+
+def pretty_table(cols: List[int], data: List[List[Any]], format_float: bool = False):
+    format_row = "{:>4}\t" * (len(cols) + 1)
+    fmt = "%s"
+    if format_float:
+        fmt = "%.4f"
+
+    print(format_row.format("", *cols))
+    for col, row in zip(cols, data):
+        row = [fmt % it for it in row]
+        print(format_row.format(f"{col}", *row))
 
 
 class HamiltonianPath:
@@ -88,15 +100,23 @@ class HamiltonianPath:
         cost = self.path_cost(path)
         self.result[start_index] = path.copy()
         print("=" * 64)
-        print("Source:", start_index, "Path:", path, "Cost:", cost)
+        print("Source:", start_index, "Path:", path, "Cost:", f"{cost:.4f}")
 
 
 if __name__ == "__main__":
     with open("8n_distances.json", "r") as json_file:
         distances = json.load(json_file)
 
+    pretty_table(
+        list(range(len(distances))),
+        distances,
+        True,
+    )
+    print()
+
     hamiltonian = HamiltonianPath(distances)
     hamiltonian.find_paths()
+
     print("=" * 64)
     print()
     pprint(hamiltonian.result)
